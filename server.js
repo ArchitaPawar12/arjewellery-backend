@@ -18,16 +18,15 @@ const app = express();
    MIDDLEWARE
 ========================= */
 
-app.use(cors());
+app.use(cors({
+  origin: "*"
+}));
+
 app.use(express.json());
 
 /* =========================
    SERVE IMAGES FOLDER
 ========================= */
-
-// Makes /images publicly accessible
-// Example:
-// https://arjewellery-backend.onrender.com/images/necklaces/necklace-24.jpg
 
 app.use(
   "/images",
@@ -42,6 +41,7 @@ app.use(
 const productRoutes = require("./routes/productRoutes");
 app.use("/api/products", productRoutes);
 
+// Auth (OTP)
 const authRoutes = require("./routes/auth");
 app.use("/api/auth", authRoutes);
 
@@ -50,11 +50,12 @@ const orderRoutes = require("./routes/orders");
 app.use("/api/orders", orderRoutes);
 
 /* =========================
-   SAVE USER AFTER FIREBASE LOGIN
+   SAVE USER (Optional)
 ========================= */
 
 app.post("/api/save-user", async (req, res) => {
   try {
+
     const { uid, email } = req.body;
 
     let user = await User.findOne({ uid });
@@ -64,16 +65,25 @@ app.post("/api/save-user", async (req, res) => {
       await user.save();
     }
 
-    res.json({ message: "User saved successfully" });
+    res.json({
+      success: true,
+      message: "User saved successfully"
+    });
 
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server error" });
+
+    console.error("Save user error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server error"
+    });
+
   }
 });
 
 /* =========================
-   DEFAULT ROUTE
+   TEST ROUTE
 ========================= */
 
 app.get("/", (req, res) => {
