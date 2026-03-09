@@ -50,18 +50,29 @@ const orderRoutes = require("./routes/orders");
 app.use("/api/orders", orderRoutes);
 
 /* =========================
-   SAVE USER (Optional)
+   SAVE USER (UPDATED)
 ========================= */
 
 app.post("/api/save-user", async (req, res) => {
   try {
 
-    const { uid, email } = req.body;
+    const { email } = req.body;
 
-    let user = await User.findOne({ uid });
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "Email required"
+      });
+    }
+
+    let user = await User.findOne({ email });
 
     if (!user) {
-      user = new User({ uid, email });
+
+      user = new User({
+        email
+      });
+
       await user.save();
     }
 
