@@ -1,23 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const nodemailer = require("nodemailer");
+const { Resend } = require("resend");
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 let otpStore = {};
-
-/* =========================
-   MAIL CONFIG (FIXED)
-========================= */
-
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true,
-  connectionTimeout: 10000,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
-});
 
 
 /* =========================
@@ -45,16 +32,16 @@ router.post("/send-otp", async (req, res) => {
 
   try {
 
-    await transporter.sendMail({
-      from: `"AR Jewellery" <${process.env.EMAIL_USER}>`,
+    await resend.emails.send({
+      from: "AR Jewellery <onboarding@resend.dev>",
       to: email,
       subject: "AR Jewellery Login OTP",
       html: `
         <div style="font-family:Arial;padding:20px">
           <h2>AR Jewellery Login OTP</h2>
           <p>Your One Time Password is:</p>
-          <h1 style="color:#000">${otp}</h1>
-          <p>This OTP is valid for a short time.</p>
+          <h1 style="color:black">${otp}</h1>
+          <p>This OTP is valid for login.</p>
         </div>
       `
     });
@@ -66,9 +53,9 @@ router.post("/send-otp", async (req, res) => {
       message: "OTP sent successfully"
     });
 
-  } catch (err) {
+  } catch (error) {
 
-    console.error("Email sending error:", err);
+    console.error("Email sending error:", error);
 
     res.status(500).json({
       success: false,
