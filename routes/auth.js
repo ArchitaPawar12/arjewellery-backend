@@ -5,16 +5,20 @@ const nodemailer = require("nodemailer");
 let otpStore = {};
 
 /* =========================
-   MAIL CONFIG
+   MAIL CONFIG (FIXED)
 ========================= */
 
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
+  connectionTimeout: 10000,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
   }
 });
+
 
 /* =========================
    SEND OTP
@@ -42,13 +46,16 @@ router.post("/send-otp", async (req, res) => {
   try {
 
     await transporter.sendMail({
-      from: process.env.EMAIL_USER,
+      from: `"AR Jewellery" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: "AR Jewellery Login OTP",
       html: `
-        <h2>Your OTP for AR Jewellery Login</h2>
-        <h1>${otp}</h1>
-        <p>This OTP is valid for login.</p>
+        <div style="font-family:Arial;padding:20px">
+          <h2>AR Jewellery Login OTP</h2>
+          <p>Your One Time Password is:</p>
+          <h1 style="color:#000">${otp}</h1>
+          <p>This OTP is valid for a short time.</p>
+        </div>
       `
     });
 
@@ -71,6 +78,7 @@ router.post("/send-otp", async (req, res) => {
   }
 
 });
+
 
 /* =========================
    VERIFY OTP
