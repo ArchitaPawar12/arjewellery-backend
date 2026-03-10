@@ -1,75 +1,42 @@
-const express = require("express");
-const router = express.Router();
-const Order = require("../models/Order");
+const mongoose = require("mongoose");
 
-/* =========================
-   CREATE ORDER
-========================= */
-router.post("/", async (req, res) => {
-  try {
+const OrderSchema = new mongoose.Schema(
+  {
+    customerName: {
+      type: String,
+      required: true
+    },
 
-    const {
-      firstname,
-      lastname,
-      email,
-      address,
-      city,
-      zip,
-      items,
-      total
-    } = req.body;
+    email: {
+      type: String,
+      required: true
+    },
 
-    const newOrder = new Order({
-      customerName: firstname + " " + lastname,
-      email: email,
-      address: address + ", " + city + " - " + zip,
-      products: items,
-      totalAmount: total,
-      status: "Processing"
-    });
+    address: {
+      type: String,
+      required: true
+    },
 
-    const savedOrder = await newOrder.save();
+    products: [
+      {
+        productId: String,
+        name: String,
+        price: Number,
+        quantity: Number
+      }
+    ],
 
-    res.status(201).json(savedOrder);
+    totalAmount: {
+      type: Number,
+      required: true
+    },
 
-  } catch (err) {
-
-    console.error("Order save error:", err);
-
-    res.status(500).json({
-      message: err.message
-    });
-
-  }
-});
-
-/* =========================
-   GET ORDERS
-========================= */
-router.get("/", async (req, res) => {
-  try {
-
-    const { email } = req.query;
-
-    let orders;
-
-    if (email) {
-      orders = await Order.find({ email }).sort({ createdAt: -1 });
-    } else {
-      orders = await Order.find().sort({ createdAt: -1 });
+    status: {
+      type: String,
+      default: "Processing"
     }
+  },
+  { timestamps: true }
+);
 
-    res.json(orders);
-
-  } catch (err) {
-
-    console.error("Fetch orders error:", err);
-
-    res.status(500).json({
-      message: err.message
-    });
-
-  }
-});
-
-module.exports = router;
+module.exports = mongoose.model("Order", OrderSchema);
