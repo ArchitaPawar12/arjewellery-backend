@@ -19,19 +19,22 @@ router.post("/", async (req, res) => {
       total
     } = req.body;
 
-    const newOrder = new Order({
-      customerName: firstname + " " + lastname,
-      email: email,
-      address: address + ", " + city + " - " + zip,
+    // Ensure items is always an array
+    const safeItems = Array.isArray(items) ? items : [];
 
-      products: items.map(item => ({
+    const newOrder = new Order({
+      customerName: (firstname || "") + " " + (lastname || ""),
+      email: email || "",
+      address: (address || "") + ", " + (city || "") + " - " + (zip || ""),
+
+      products: safeItems.map(item => ({
         productId: item.id || "",
-        name: item.name,
-        price: item.price,
-        quantity: item.quantity
+        name: item.name || "",
+        price: item.price || 0,
+        quantity: item.quantity || 1
       })),
 
-      totalAmount: total,
+      totalAmount: total || 0,
       status: "Processing"
     });
 
@@ -59,23 +62,22 @@ router.get("/", async (req, res) => {
 
     const { email } = req.query;
 
-    let orders;
+    let orders = [];
 
     if (email) {
-      orders = await Order.find({ email }).sort({ createdAt: -1 });
+      orders = await Order.find({ email: email }).sort({ createdAt: -1 });
     } else {
       orders = await Order.find().sort({ createdAt: -1 });
     }
 
-    res.json(orders);
+    res.status(200).json(orders);
 
   } catch (error) {
 
     console.error("Fetch orders error:", error);
 
-    res.status(500).json({
-      message: "Failed to fetch orders"
-    });
+    // Always return array so frontend doesn't crash
+    res.status(200).json([]);
 
   }
 });
