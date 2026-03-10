@@ -21,8 +21,10 @@ router.post("/", async (req, res) => {
       total
     } = req.body;
 
+    // Ensure items array exists
     const orderItems = Array.isArray(items) ? items : [];
 
+    // Convert items to products format
     const products = orderItems.map(item => ({
       productId: item.productId || item.id || "",
       name: item.name || "Product",
@@ -30,6 +32,7 @@ router.post("/", async (req, res) => {
       quantity: Number(item.quantity) || 1
     }));
 
+    // Create order
     const newOrder = new Order({
       customerName: `${firstname || ""} ${lastname || ""}`.trim(),
       email: email || "",
@@ -41,13 +44,17 @@ router.post("/", async (req, res) => {
 
     const savedOrder = await newOrder.save();
 
-    res.status(201).json(savedOrder);
+    res.status(201).json({
+      success: true,
+      order: savedOrder
+    });
 
   } catch (error) {
 
     console.error("Order creation error:", error);
 
     res.status(500).json({
+      success: false,
       message: "Order creation failed",
       error: error.message
     });
@@ -72,13 +79,17 @@ router.get("/", async (req, res) => {
       orders = await Order.find().sort({ createdAt: -1 });
     }
 
-    res.json(orders);
+    res.json({
+      success: true,
+      orders: orders
+    });
 
   } catch (error) {
 
     console.error("Fetch orders error:", error);
 
     res.status(500).json({
+      success: false,
       message: "Failed to fetch orders"
     });
 
