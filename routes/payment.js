@@ -17,11 +17,18 @@ router.post("/create-order", async (req, res) => {
         order_id: orderId,
         order_amount: amount,
         order_currency: "INR",
+
         customer_details: {
           customer_id: customerId,
           customer_email: email,
           customer_phone: "9999999999"
+        },
+
+        // ✅ REQUIRED CHANGE
+        order_meta: {
+          return_url: "https://arjewellery-d953b.web.app/pages/payment-success.html?order_id={order_id}"
         }
+
       },
       {
         headers: {
