@@ -8,6 +8,8 @@ const Order = require("../models/Order");
 router.post("/", async (req, res) => {
   try {
 
+    console.log("Incoming Order Data:", req.body);
+
     const {
       firstname,
       lastname,
@@ -19,22 +21,22 @@ router.post("/", async (req, res) => {
       total
     } = req.body;
 
-    // safety check
+    // Ensure items is always an array
     const orderItems = Array.isArray(items) ? items : [];
 
+    const products = orderItems.map(item => ({
+      productId: item.productId || item.id || "",
+      name: item.name || "Unknown Product",
+      price: Number(item.price) || 0,
+      quantity: Number(item.quantity) || 1
+    }));
+
     const newOrder = new Order({
-      customerName: firstname + " " + lastname,
-      email: email,
-      address: address + ", " + city + " - " + zip,
-
-      products: orderItems.map(item => ({
-        productId: item.productId || item.id || "",
-        name: item.name || "",
-        price: item.price || 0,
-        quantity: item.quantity || 1
-      })),
-
-      totalAmount: total || 0,
+      customerName: `${firstname || ""} ${lastname || ""}`.trim(),
+      email: email || "",
+      address: `${address || ""}, ${city || ""} - ${zip || ""}`,
+      products: products,
+      totalAmount: Number(total) || 0,
       status: "Processing"
     });
 
@@ -47,7 +49,8 @@ router.post("/", async (req, res) => {
     console.error("Order creation error:", error);
 
     res.status(500).json({
-      message: "Failed to create order"
+      message: "Order creation failed",
+      error: error.message
     });
 
   }
@@ -77,7 +80,8 @@ router.get("/", async (req, res) => {
     console.error("Fetch orders error:", error);
 
     res.status(500).json({
-      message: "Failed to fetch orders"
+      message: "Failed to fetch orders",
+      error: error.message
     });
 
   }
