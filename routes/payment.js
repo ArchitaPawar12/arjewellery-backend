@@ -1,15 +1,14 @@
 const express = require("express");
 const router = express.Router();
-const { Cashfree, CFEnvironment } = require("cashfree-pg");
+const { Cashfree } = require("cashfree-pg");
 
-const cashfree = new Cashfree(
-  CFEnvironment.SANDBOX,
-  process.env.CASHFREE_APP_ID,
-  process.env.CASHFREE_SECRET_KEY
-);
+const cashfree = new Cashfree({
+  mode: "sandbox", // test mode
+  appId: process.env.CASHFREE_APP_ID,
+  secretKey: process.env.CASHFREE_SECRET_KEY
+});
 
 router.post("/create-order", async (req, res) => {
-
   try {
 
     const { amount, email } = req.body;
@@ -24,6 +23,9 @@ router.post("/create-order", async (req, res) => {
         customer_id: email,
         customer_email: email,
         customer_phone: "9999999999"
+      },
+      order_meta: {
+        return_url: "https://arjewellery-d953b.web.app/payment-success.html"
       }
     };
 
@@ -40,7 +42,6 @@ router.post("/create-order", async (req, res) => {
     });
 
   }
-
 });
 
 module.exports = router;
