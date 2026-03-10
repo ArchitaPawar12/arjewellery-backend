@@ -3,12 +3,13 @@ const router = express.Router();
 const { Cashfree } = require("cashfree-pg");
 
 const cashfree = new Cashfree({
-  mode: "sandbox", // test mode
+  mode: "sandbox",
   appId: process.env.CASHFREE_APP_ID,
   secretKey: process.env.CASHFREE_SECRET_KEY
 });
 
 router.post("/create-order", async (req, res) => {
+
   try {
 
     const { amount, email } = req.body;
@@ -38,10 +39,11 @@ router.post("/create-order", async (req, res) => {
     console.error("Cashfree error:", error);
 
     res.status(500).json({
-      message: "Cashfree order creation failed"
+      message: "Payment creation failed"
     });
 
   }
+
 });
 
 module.exports = router;
