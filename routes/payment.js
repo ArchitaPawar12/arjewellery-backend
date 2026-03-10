@@ -9,6 +9,7 @@ router.post("/create-order", async (req, res) => {
     const { amount, email } = req.body;
 
     const orderId = "order_" + Date.now();
+    const customerId = "cust_" + Date.now();
 
     const response = await axios.post(
       "https://sandbox.cashfree.com/pg/orders",
@@ -17,7 +18,7 @@ router.post("/create-order", async (req, res) => {
         order_amount: amount,
         order_currency: "INR",
         customer_details: {
-          customer_id: email,
+          customer_id: customerId,
           customer_email: email,
           customer_phone: "9999999999"
         }
