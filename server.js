@@ -6,6 +6,9 @@ const path = require("path");
 const connectDB = require("./db");
 const User = require("./models/User");
 
+const paymentRoutes = require("./routes/payment");
+app.use("/api/payment", paymentRoutes);
+
 // Load environment variables
 dotenv.config();
 
