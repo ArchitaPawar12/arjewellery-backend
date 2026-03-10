@@ -8,24 +8,48 @@ const Order = require("../models/Order");
 router.post("/", async (req, res) => {
   try {
 
-    console.log("Incoming order:", req.body);
+    const {
+      firstname,
+      lastname,
+      email,
+      address,
+      city,
+      zip,
+      items,
+      total
+    } = req.body;
 
-    const order = new Order(req.body);
+    const newOrder = new Order({
+      customerName: firstname + " " + lastname,
+      email: email,
+      address: address + ", " + city + " - " + zip,
 
-    await order.save();
+      products: items.map(item => ({
+        productId: item.id || "",
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity
+      })),
 
-    res.status(201).json(order);
+      totalAmount: total,
+      status: "Processing"
+    });
 
-  } catch (err) {
+    const savedOrder = await newOrder.save();
 
-    console.error("Order save error:", err);
+    res.status(201).json(savedOrder);
+
+  } catch (error) {
+
+    console.error("Order creation error:", error);
 
     res.status(500).json({
-      message: err.message
+      message: "Failed to create order"
     });
 
   }
 });
+
 
 /* =========================
    GET ORDERS
@@ -38,23 +62,19 @@ router.get("/", async (req, res) => {
     let orders;
 
     if (email) {
-
       orders = await Order.find({ email }).sort({ createdAt: -1 });
-
     } else {
-
       orders = await Order.find().sort({ createdAt: -1 });
-
     }
 
     res.json(orders);
 
-  } catch (err) {
+  } catch (error) {
 
-    console.error("Fetch orders error:", err);
+    console.error("Fetch orders error:", error);
 
     res.status(500).json({
-      message: err.message
+      message: "Failed to fetch orders"
     });
 
   }
