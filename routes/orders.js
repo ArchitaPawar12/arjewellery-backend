@@ -25,13 +25,13 @@ router.post("/", async (req, res) => {
     const orderItems = Array.isArray(items) ? items : [];
 
     // Convert items to products format
-    const products = orderItems.map(item => ({
-      productId: item.productId || item.id || "",
-      name: item.name || "Product",
-      price: Number(item.price) || 0,
-      quantity: Number(item.quantity) || 1
-    }));
-
+   const products = orderItems.map(item => ({
+  productId: item.productId || item.id || "",
+  name: item.name || "Product",
+  price: Number(item.price) || 0,
+  quantity: Number(item.quantity) || 1,
+  image: item.image || ""
+}));
     // Create order
     const newOrder = new Order({
       customerName: `${firstname || ""} ${lastname || ""}`.trim(),
