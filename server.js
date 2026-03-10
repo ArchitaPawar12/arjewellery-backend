@@ -6,15 +6,13 @@ const path = require("path");
 const connectDB = require("./db");
 const User = require("./models/User");
 
-const paymentRoutes = require("./routes/payment");
-app.use("/api/payment", paymentRoutes);
-
 // Load environment variables
 dotenv.config();
 
 // Connect database
 connectDB();
 
+// Initialize app
 const app = express();
 
 /* =========================
@@ -39,6 +37,10 @@ app.use(
 /* =========================
    ROUTES
 ========================= */
+
+// Payment
+const paymentRoutes = require("./routes/payment");
+app.use("/api/payment", paymentRoutes);
 
 // Products
 const productRoutes = require("./routes/productRoutes");
