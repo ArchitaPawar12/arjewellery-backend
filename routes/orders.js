@@ -8,7 +8,7 @@ const Order = require("../models/Order");
 router.post("/", async (req, res) => {
   try {
 
-    console.log("Incoming Order Data:", req.body);
+    console.log("Incoming Order:", req.body);
 
     const {
       firstname,
@@ -21,12 +21,11 @@ router.post("/", async (req, res) => {
       total
     } = req.body;
 
-    // Ensure items is always an array
     const orderItems = Array.isArray(items) ? items : [];
 
     const products = orderItems.map(item => ({
       productId: item.productId || item.id || "",
-      name: item.name || "Unknown Product",
+      name: item.name || "Product",
       price: Number(item.price) || 0,
       quantity: Number(item.quantity) || 1
     }));
@@ -80,8 +79,7 @@ router.get("/", async (req, res) => {
     console.error("Fetch orders error:", error);
 
     res.status(500).json({
-      message: "Failed to fetch orders",
-      error: error.message
+      message: "Failed to fetch orders"
     });
 
   }
