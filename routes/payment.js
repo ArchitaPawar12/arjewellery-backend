@@ -1,12 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { Cashfree } = require("cashfree-pg");
-
-const cashfree = new Cashfree({
-  mode: "sandbox",
-  appId: process.env.CASHFREE_APP_ID,
-  secretKey: process.env.CASHFREE_SECRET_KEY
-});
+const axios = require("axios");
 
 router.post("/create-order", async (req, res) => {
 
@@ -16,27 +10,33 @@ router.post("/create-order", async (req, res) => {
 
     const orderId = "order_" + Date.now();
 
-    const request = {
-      order_amount: amount,
-      order_currency: "INR",
-      order_id: orderId,
-      customer_details: {
-        customer_id: email,
-        customer_email: email,
-        customer_phone: "9999999999"
+    const response = await axios.post(
+      "https://sandbox.cashfree.com/pg/orders",
+      {
+        order_id: orderId,
+        order_amount: amount,
+        order_currency: "INR",
+        customer_details: {
+          customer_id: email,
+          customer_email: email,
+          customer_phone: "9999999999"
+        }
       },
-      order_meta: {
-        return_url: "https://arjewellery-d953b.web.app/payment-success.html"
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "x-client-id": process.env.CASHFREE_APP_ID,
+          "x-client-secret": process.env.CASHFREE_SECRET_KEY,
+          "x-api-version": "2022-09-01"
+        }
       }
-    };
-
-    const response = await cashfree.PGCreateOrder("2022-09-01", request);
+    );
 
     res.json(response.data);
 
   } catch (error) {
 
-    console.error("Cashfree error:", error);
+    console.error("Cashfree error:", error.response?.data || error);
 
     res.status(500).json({
       message: "Payment creation failed"
