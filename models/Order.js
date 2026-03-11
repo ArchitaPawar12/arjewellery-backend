@@ -22,7 +22,10 @@ const OrderSchema = new mongoose.Schema(
         productId: String,
         name: String,
         price: Number,
-        quantity: Number
+        quantity: Number,
+
+        // ADD THIS
+        image: String
       }
     ],
 
