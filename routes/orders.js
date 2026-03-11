@@ -25,13 +25,14 @@ router.post("/", async (req, res) => {
     const orderItems = Array.isArray(items) ? items : [];
 
     // Convert items to products format
-   const products = orderItems.map(item => ({
-  productId: item.productId || item.id || "",
-  name: item.name || "Product",
-  price: Number(item.price) || 0,
-  quantity: Number(item.quantity) || 1,
-  image: item.image || ""
-}));
+    const products = orderItems.map(item => ({
+      productId: item.productId || item.id || "",
+      name: item.name || "Product",
+      price: Number(item.price) || 0,
+      quantity: Number(item.quantity) || 1,
+      image: item.image || ""   // ensure image is saved
+    }));
+
     // Create order
     const newOrder = new Order({
       customerName: `${firstname || ""} ${lastname || ""}`.trim(),
@@ -44,10 +45,7 @@ router.post("/", async (req, res) => {
 
     const savedOrder = await newOrder.save();
 
-    res.status(201).json({
-      success: true,
-      order: savedOrder
-    });
+    res.status(201).json(savedOrder);   // return order directly
 
   } catch (error) {
 
@@ -79,10 +77,7 @@ router.get("/", async (req, res) => {
       orders = await Order.find().sort({ createdAt: -1 });
     }
 
-    res.json({
-      success: true,
-      orders: orders
-    });
+    res.json(orders);   // return array directly
 
   } catch (error) {
 
